@@ -19,7 +19,7 @@ FLAG.add_argument('--manual_seed', default=42, help='manual seed.')
 FLAG.add_argument('--image_size', default=64, help='image size.')
 FLAG.add_argument('--batch_size', default=64, help='batch size.')
 FLAG.add_argument('--num_workers', default=10, help='num workers.')
-FLAG.add_argument('--num_epoches', default=50, help='num workers.')
+FLAG.add_argument('--num_epoches', default=30, help='num workers.')
 FLAG.add_argument('--nz', default=64, help='length of noize.')
 FLAG.add_argument('--ndf', default=64, help='number of filters.')
 FLAG.add_argument('--ngf', default=64, help='number of filters.')
@@ -117,7 +117,7 @@ def train(epoch):
 
 def test(epoch):
     netg.eval()
-    noise = Variable(torch.Tensor(100, opt.nz)).cuda()
+    noise = Variable(torch.Tensor(100, opt.nz).normal_(0, 1)).cuda()
     noise.mul_(embed(fixed))
     fixed_input = netg(noise)
 
