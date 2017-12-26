@@ -81,15 +81,15 @@ class D(nn.Module):
         x = self.lrelu(x)
 
         x = self.conv2(x)
-        x = self.BatchNorm2(x)
+        x = self.bn2(x)
         x = self.lrelu(x)
 
         x = self.conv3(x)
-        x = self.BatchNorm3(x)
+        x = self.bn3(x)
         x = self.lrelu(x)
 
         x = self.conv4(x)
-        x = self.BatchNorm4(x)
+        x = self.bn4(x)
         x = self.lrelu(x)
 
         x = self.conv5(x)
