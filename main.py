@@ -9,7 +9,7 @@ from torch.autograd import Variable
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as utils
-
+import torch.nn.functional as F
 from models import D, G
 
 FLAG = argparse.ArgumentParser(description='ACGAN Implement With Pytorch.')
@@ -34,12 +34,11 @@ torch.cuda.manual_seed(opt.manual_seed)
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.enbaled = True
 
-tsfm = transforms.Compose([
+tsfm=transforms.Compose([
     transforms.Resize(opt.image_size),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
-
 if opt.dataset == 'cifar10':
     dataset = dset.CIFAR10(root=opt.dataroot, download=True, transform=tsfm)
 elif opt.dataset == 'mnist':
@@ -56,7 +55,7 @@ netg = G(ngf=opt.ngf, nc=1, nz=opt.nz).cuda()
 optd = optim.Adam(netd.parameters(), lr=2e-4, betas=(0.5, 0.999))
 optg = optim.Adam(netg.parameters(), lr=2e-4, betas=(0.5, 0.999))
 
-fixed = Variable(torch.LongTensor(range(10))).cuda()
+fixed = Variable(torch.LongTensor([range(10)]*10)).view(-1).cuda()
 embed = nn.Embedding(10, opt.nz).cuda()
 
 def train(epoch):
@@ -73,7 +72,7 @@ def train(epoch):
         #######################
         # fake input and label
         #######################
-        noise = Variable(torch.Tensor(opt.batch_size, opt.nz)).cuda()
+        noise = Variable(torch.Tensor(opt.batch_size, opt.nz).normal_(0, 1)).cuda()
         fake_label = Variable(torch.LongTensor(opt.batch_size).random_(10)).cuda()
         noise.mul_(embed(fake_label))
         fake_ = Variable(torch.zeros(fake_label.size())).cuda()
@@ -118,11 +117,11 @@ def train(epoch):
 
 def test(epoch):
     netg.eval()
-    noise = Variable(torch.Tensor(opt.batch_size, 64)).cuda()
+    noise = Variable(torch.Tensor(100, opt.nz)).cuda()
     noise.mul_(embed(fixed))
     fixed_input = netg(noise)
 
-    utils.save_image(fixed_input.data, f'images/fixed_{epoch:03d}.jpg')
+    utils.save_image(fixed_input.data, f'images/fixed_{epoch:03d}.jpg', ncols=10)
 
 
 if __name__ == '__main__':

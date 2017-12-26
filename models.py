@@ -1,5 +1,5 @@
 import torch.nn as nn
-
+import torch.nn.functional as F
 
 class G(nn.Module):
 
@@ -20,7 +20,7 @@ class G(nn.Module):
         self.conv5 = nn.ConvTranspose2d(ngf * 1, nc, 4, 2, 1, bias=False)
 
         self.relu = nn.ReLU(True)
-        self.tanh = nn.Tanh()
+        # self.tanh = nn.Tanh()
 
         self.__initialize_weights()
 
@@ -43,8 +43,8 @@ class G(nn.Module):
         x = self.relu(x)
 
         x = self.conv5(x)
-        output = self.tanh(x)
-        return output
+        # output = self.tanh(x)
+        return x#output
 
     def __initialize_weights(self):
         for m in self.modules():
@@ -71,8 +71,9 @@ class D(nn.Module):
         self.conv5 = nn.Conv2d(ndf * 8, ndf * 1, 4, 1, 0, bias=False)
         self.gan_linear = nn.Linear(ndf * 1, 1)
         self.aux_linear = nn.Linear(ndf * 1, num_classes)
-        self.logsoftmax = nn.LogSoftmax(dim=1)
+
         self.sigmoid = nn.Sigmoid()
+        self.logsoftmax = nn.LogSoftmax(dim=1)
         self.__initialize_weights()
     
     def forward(self, input):
@@ -95,7 +96,7 @@ class D(nn.Module):
         x = self.conv5(x)
         x = x.view(-1, self.ndf * 1)
         c = self.aux_linear(x)
-        c = self.logsoftmax(c)
+        c = self.logsoftmax(c, dim=1)
 
         s = self.gan_linear(x)
         s = self.sigmoid(s)
