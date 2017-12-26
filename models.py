@@ -25,8 +25,8 @@ class G(nn.Module):
         self.__initialize_weights()
 
     def forward(self, input):
-
-        x = self.conv1(input)
+        x = input.view(input.size(0), -1, 1, 1)
+        x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
 

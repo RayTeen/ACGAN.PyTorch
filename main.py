@@ -57,7 +57,7 @@ optd = optim.Adam(netd.parameters(), lr=2e-4, betas=(0.5, 0.999))
 optg = optim.Adam(netg.parameters(), lr=2e-4, betas=(0.5, 0.999))
 
 fixed = Variable(torch.LongTensor(range(10))).cuda()
-embed = nn.Embedding(10, opt.nz)
+embed = nn.Embedding(10, opt.nz).cuda()
 
 def train(epoch):
     netg.train()
