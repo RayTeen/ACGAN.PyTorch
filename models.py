@@ -96,7 +96,7 @@ class D(nn.Module):
         x = self.conv5(x)
         x = x.view(-1, self.ndf * 1)
         c = self.aux_linear(x)
-        c = self.logsoftmax(c, dim=1)
+        c = self.logsoftmax(c)
 
         s = self.gan_linear(x)
         s = self.sigmoid(s)
