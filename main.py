@@ -16,7 +16,7 @@ FLAG = argparse.ArgumentParser(description='ACGAN Implement With Pytorch.')
 FLAG.add_argument('--dataset', default='mnist', help='cifar10 | mnist.')
 FLAG.add_argument('--dataroot', default='data', help='path to dataset.')
 FLAG.add_argument('--manual_seed', default=42, help='manual seed.')
-FLAG.add_argument('--image_size', default=28, help='image size.')
+FLAG.add_argument('--image_size', default=64, help='image size.')
 FLAG.add_argument('--batch_size', default=64, help='batch size.')
 FLAG.add_argument('--num_workers', default=10, help='num workers.')
 FLAG.add_argument('--num_epoches', default=50, help='num workers.')
@@ -68,7 +68,7 @@ def train(epoch):
         #######################
         real_input = Variable(image).cuda()
         real_label = Variable(label).cuda()
-        real_ = torch.ones_like(real_label)
+        real_ = Variable(torch.ones(real_label.size())).cuda()
 
         #######################
         # fake input and label
@@ -76,7 +76,7 @@ def train(epoch):
         noise = Variable(torch.Tensor(opt.batch_size, opt.nz)).cuda()
         fake_label = Variable(torch.LongTensor(opt.batch_size).random_(10)).cuda()
         noise.mul_(embed(fake_label))
-        fake_ = torch.zeros_like(fake_label)
+        fake_ = Variable(torch.zeros(fake_label.size())).cuda()
 
         #######################
         # update net d
@@ -98,6 +98,7 @@ def train(epoch):
         #######################
         optg.zero_grad()
         fake_pred, fake_cls = netd(fake_input)
+        real_ = Variable(torch.ones(fake_label.size())).cuda()
         g_loss = bce(fake_pred, real_) + nll(fake_cls, fake_label)
         g_loss.backward()
         optg.step()
@@ -127,5 +128,6 @@ def test(epoch):
 if __name__ == '__main__':
     
     for epoch in range(opt.num_epoches):
+        print(f'Epoch {epoch:03d}.')
         train(epoch)
         test(epoch)

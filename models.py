@@ -71,7 +71,7 @@ class D(nn.Module):
         self.conv5 = nn.Conv2d(ndf * 8, ndf * 1, 4, 1, 0, bias=False)
         self.gan_linear = nn.Linear(ndf * 1, 1)
         self.aux_linear = nn.Linear(ndf * 1, num_classes)
-        self.logsoftmax = nn.LogSoftmax()
+        self.logsoftmax = nn.LogSoftmax(dim=1)
         self.sigmoid = nn.Sigmoid()
         self.__initialize_weights()
     
@@ -99,7 +99,7 @@ class D(nn.Module):
 
         s = self.gan_linear(x)
         s = self.sigmoid(s)
-        return s, c
+        return s.squeeze(1), c.squeeze(1)
 
     def __initialize_weights(self):
         for m in self.modules():
