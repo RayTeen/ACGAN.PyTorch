@@ -13,10 +13,10 @@ import torchvision.utils as utils
 from models import D, G
 
 FLAG = argparse.ArgumentParser(description='ACGAN Implement With Pytorch.')
-FLAG.add_argument('--dataset', required='mnist', help='cifar10 | mnist.')
+FLAG.add_argument('--dataset', default='mnist', help='cifar10 | mnist.')
 FLAG.add_argument('--dataroot', default='data', help='path to dataset.')
 FLAG.add_argument('--manual_seed', default=42, help='manual seed.')
-FLAG.add_argument('--image_size', dafault=28, help='image size.')
+FLAG.add_argument('--image_size', default=28, help='image size.')
 FLAG.add_argument('--batch_size', default=64, help='batch size.')
 FLAG.add_argument('--num_workers', default=10, help='num workers.')
 FLAG.add_argument('--nz', default=32, help='length of noize.')
@@ -44,7 +44,7 @@ if opt.dataset == 'cifar10':
 elif opt.dataset == 'mnist':
     dataset = dset.MNIST(root=opt.dataroot, download=True, train=True, transform=tsfm)
 
-loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)
+loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers)
 
 bce = nn.BCELoss().cuda()
 nll = nn.NLLLoss().cuda()

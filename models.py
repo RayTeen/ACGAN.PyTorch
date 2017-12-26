@@ -1,7 +1,6 @@
 import torch.nn as nn
 
 
-
 class G(nn.Module):
 
     def __init__(self, nz, ngf, nc):
@@ -49,9 +48,9 @@ class G(nn.Module):
 
     def __initialize_weights(self):
         for m in self.modules():
-            if isinstance(m. nn.Conv2d):
+            if isinstance(m, nn.Conv2d):
                 m.weight.data.normal_(0.0, 0.02)
-            elif isinstance(m. nn.BatchNorm2d):
+            elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.normal_(1.0, 0.02)
                 m.bias.data.fill_(0)
 
@@ -104,8 +103,8 @@ class D(nn.Module):
 
     def __initialize_weights(self):
         for m in self.modules():
-            if isinstance(m. nn.Conv2d):
+            if isinstance(m, nn.Conv2d):
                 m.weight.data.normal_(0.0, 0.02)
-            elif isinstance(m. nn.BatchNorm2d):
+            elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.normal_(1.0, 0.02)
                 m.bias.data.fill_(0)
