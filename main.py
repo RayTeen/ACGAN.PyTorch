@@ -50,7 +50,7 @@ bce = nn.BCELoss().cuda()
 nll = nn.NLLLoss().cuda()
 
 netd = D(ndf=opt.ndf, nc=1, num_classes=10).cuda()
-netg = G(ngf=opt.nfg, nc=1, nz=opt.nz).cuda()
+netg = G(ngf=opt.ngf, nc=1, nz=opt.nz).cuda()
 
 optd = optim.Adam(netd.parameters(), lr=2e-4, betas=(0.5, 0.999))
 optg = optim.Adam(netg.parameters(), lr=2e-4, betas=(0.5, 0.999))
