@@ -19,6 +19,7 @@ FLAG.add_argument('--manual_seed', default=42, help='manual seed.')
 FLAG.add_argument('--image_size', default=28, help='image size.')
 FLAG.add_argument('--batch_size', default=64, help='batch size.')
 FLAG.add_argument('--num_workers', default=10, help='num workers.')
+FLAG.add_argument('--num_epoches', default=50, help='num workers.')
 FLAG.add_argument('--nz', default=32, help='length of noize.')
 FLAG.add_argument('--ndf', default=64, help='number of filters.')
 FLAG.add_argument('--ngf', default=64, help='number of filters.')
@@ -67,7 +68,7 @@ def train(epoch):
         #######################
         real_input = Variable(image).cuda()
         real_label = Variable(label).cuda()
-        real_ = Variable(torch.ones_like(real_label))
+        real_ = torch.ones_like(real_label)
 
         #######################
         # fake input and label
@@ -75,7 +76,7 @@ def train(epoch):
         noise = Variable(torch.Tensor(opt.batch_size, opt.nz)).cuda()
         fake_label = Variable(torch.LongTensor(opt.batch_size).random_(10)).cuda()
         noise.mul_(embed(fake_label))
-        fake_ = Variable(torch.zeros_like(fake_label))
+        fake_ = torch.zeros_like(fake_label)
 
         #######################
         # update net d
