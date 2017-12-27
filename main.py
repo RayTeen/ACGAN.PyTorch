@@ -47,7 +47,7 @@ elif opt.dataset == 'mnist':
 loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers)
 
 bce = nn.BCELoss().cuda()
-nll = nn.NLLLoss().cuda()
+cep = nn.CrossEntropyLoss().cuda()
 
 netd = D(ndf=opt.ndf, nc=1, num_classes=10).cuda()
 netg = G(ngf=opt.ngf, nc=1, nz=opt.nz).cuda()
@@ -55,8 +55,10 @@ netg = G(ngf=opt.ngf, nc=1, nz=opt.nz).cuda()
 optd = optim.Adam(netd.parameters(), lr=2e-4, betas=(0.5, 0.999))
 optg = optim.Adam(netg.parameters(), lr=2e-4, betas=(0.5, 0.999))
 
-fixed = Variable(torch.LongTensor([range(10)]*10)).view(-1).cuda()
 embed = nn.Embedding(10, opt.nz).cuda()
+label = Variable(torch.LongTensor([range(10)]*10)).view(-1).cuda()
+fixed = Variable(torch.Tensor(100, opt.nz).normal_(0, 1)).cuda()
+fixed.mul_(embed(label))
 
 def train(epoch):
     netg.train()
@@ -86,8 +88,8 @@ def train(epoch):
         real_pred, real_cls = netd(real_input)
         fake_pred, fake_cls = netd(fake_input.detach())
 
-        real_loss = bce(real_pred, real_) + nll(real_cls, real_label)
-        fake_loss = bce(fake_pred, fake_) + nll(fake_cls, fake_label)
+        real_loss = bce(real_pred, real_) + cep(real_cls, real_label) * 10
+        fake_loss = bce(fake_pred, fake_) + cep(fake_cls, fake_label) * 10
         d_loss = real_loss + fake_loss
         d_loss.backward()
         optd.step()
@@ -98,7 +100,7 @@ def train(epoch):
         optg.zero_grad()
         fake_pred, fake_cls = netd(fake_input)
         real_ = Variable(torch.ones(fake_label.size())).cuda()
-        g_loss = bce(fake_pred, real_) + nll(fake_cls, fake_label)
+        g_loss = bce(fake_pred, real_) + cep(fake_cls, fake_label) * 10
         g_loss.backward()
         optg.step()
 
@@ -117,9 +119,8 @@ def train(epoch):
 
 def test(epoch):
     netg.eval()
-    noise = Variable(torch.Tensor(100, opt.nz).normal_(0, 1)).cuda()
-    noise.mul_(embed(fixed))
-    fixed_input = netg(noise)
+
+    fixed_input = netg(fixed)
 
     utils.save_image(fixed_input.data, f'images/fixed_{epoch:03d}.jpg', nrow=10)
 
