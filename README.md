@@ -11,6 +11,7 @@ sample from  0~30 epoch
 
 ### Cifar10
 sample from  0~50 epoch
+
 ![](images/cifar10.gif)
 
 ## acknowledgement
