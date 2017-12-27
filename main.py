@@ -19,7 +19,7 @@ FLAG.add_argument('--manual_seed', default=42, help='manual seed.')
 FLAG.add_argument('--image_size', default=64, help='image size.')
 FLAG.add_argument('--batch_size', default=64, help='batch size.')
 FLAG.add_argument('--num_workers', default=10, help='num workers.')
-FLAG.add_argument('--num_epoches', default=30, help='num workers.')
+FLAG.add_argument('--num_epoches', default=50, help='num workers.')
 FLAG.add_argument('--nz', default=64, help='length of noize.')
 FLAG.add_argument('--ndf', default=64, help='number of filters.')
 FLAG.add_argument('--ngf', default=64, help='number of filters.')
@@ -49,16 +49,21 @@ loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle
 bce = nn.BCELoss().cuda()
 cep = nn.CrossEntropyLoss().cuda()
 
-netd = D(ndf=opt.ndf, nc=1, num_classes=10).cuda()
-netg = G(ngf=opt.ngf, nc=1, nz=opt.nz).cuda()
+opt.nc = 1 if opt.dataset == 'mnist' else 3
 
-optd = optim.Adam(netd.parameters(), lr=2e-4, betas=(0.5, 0.999))
-optg = optim.Adam(netg.parameters(), lr=2e-4, betas=(0.5, 0.999))
+netd = D(ndf=opt.ndf, nc=opt.nc, num_classes=10).cuda()
+netg = G(ngf=opt.ngf, nc=opt.nc, nz=opt.nz).cuda()
+
+optd = optim.Adam(netd.parameters(), lr=0.0002, betas=(0.5, 0.999))
+optg = optim.Adam(netg.parameters(), lr=0.0002, betas=(0.5, 0.999))
 
 embed = nn.Embedding(10, opt.nz).cuda()
 label = Variable(torch.LongTensor([range(10)]*10)).view(-1).cuda()
 fixed = Variable(torch.Tensor(100, opt.nz).normal_(0, 1)).cuda()
 fixed.mul_(embed(label))
+
+def denorm(x):
+    return x * 0.5 + 0.5
 
 def train(epoch):
     netg.train()
@@ -107,8 +112,8 @@ def train(epoch):
     #######################
     # save image pre epoch
     #######################
-    utils.save_image(fake_input.data, f'images/fake_{epoch:03d}.jpg')
-    utils.save_image(real_input.data, f'images/real_{epoch:03d}.jpg')
+    utils.save_image(denorm(fake_input.data), f'images/fake_{epoch:03d}.jpg')
+    utils.save_image(denorm(real_input.data), f'images/real_{epoch:03d}.jpg')
 
     #######################
     # save model pre epoch
@@ -122,7 +127,7 @@ def test(epoch):
 
     fixed_input = netg(fixed)
 
-    utils.save_image(fixed_input.data, f'images/fixed_{epoch:03d}.jpg', nrow=10)
+    utils.save_image(denorm(fixed_input.data), f'images/fixed_{epoch:03d}.jpg', nrow=10)
 
 
 if __name__ == '__main__':
