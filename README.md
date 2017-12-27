@@ -4,9 +4,14 @@ An PyTorch implementation of [Conditional Image Synthesis with Auxiliary Classif
 
 ## result
 
+### Mnist
 sample from  0~30 epoch
 
 ![](images/test.gif)
+
+### Cifar10
+sample from  0~50 epoch
+![](images/cifar10.gif)
 
 ## acknowledgement
 
